@@ -52,7 +52,21 @@ Your Readwise token is at [readwise.io/access_token](https://readwise.io/access_
 
 ### 3. Configure signing
 
-In Xcode, go to the **ReadwiseWatch** target → **Signing & Capabilities** → select your Apple Developer team.
+Copy the example config and set your Apple Developer Team ID:
+
+```bash
+cp Local.example.xcconfig Local.xcconfig
+```
+
+Edit `Local.xcconfig`:
+
+```
+DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
+```
+
+Find your Team ID in Xcode → Settings → Accounts → your account → Team ID column.
+
+`Local.xcconfig` is gitignored and will never be committed.
 
 ### 4. Build and run
 
@@ -82,3 +96,5 @@ Or automate it with a cron job every few hours.
 | `ReadwiseWatch/Services/TokenStorage.swift` | Token lookup (Keychain + Secrets.swift fallback) |
 | `ReadwiseWatch/Info.plist` | watchOS app configuration |
 | `Secrets.example.swift` | Template for your token file |
+| `Local.xcconfig` | Your team ID for signing (gitignored) |
+| `Local.example.xcconfig` | Template for the signing config |

@@ -16,8 +16,9 @@ xcuserdata/
 Packages/
 Package.resolved
 
-# Secrets
+# Secrets and local config
 Secrets.swift
+Local.xcconfig
 
 # macOS
 .DS_Store
