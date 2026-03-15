@@ -1,4 +1,4 @@
-# readwise-ai-watchapp
+# readwise-ai-watchapp v1.1
 
 A standalone Apple Watch app that fetches and displays your latest AI-generated news briefing from [Readwise Reader](https://readwise.io/read).
 

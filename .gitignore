@@ -27,3 +27,4 @@ Local.xcconfig
 
 # Claude
 .claude/
+CLAUDE.md
