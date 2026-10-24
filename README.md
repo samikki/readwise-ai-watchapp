@@ -15,7 +15,7 @@ Designed to work with [readwise-ai](https://github.com/samikki/readwise-ai), whi
 
 ## Requirements
 
-- Xcode 15+
+- Xcode 26.3 (the version the project was last saved with, per `LastUpgradeCheck = 2630` in `project.pbxproj`; older Xcode versions are untested)
 - watchOS 10+
 - A [Readwise](https://readwise.io) account with Reader
 - The [readwise-ai](https://github.com/samikki/readwise-ai) backend running to generate watch summaries
@@ -48,6 +48,11 @@ enum Secrets {
 
 `Secrets.swift` is gitignored and will never be committed.
 
+> [!WARNING]
+> **Never share or distribute a build of this app.** The token in `Secrets.swift` is compiled into the app binary, and anyone with a copy of the build can extract it. A Readwise token gives full read/write access to your entire Readwise library.
+
+`TokenStorage.swift` contains a Keychain lookup, but that path is currently unused: `saveToken` has no caller, so nothing is ever written to the Keychain and the token always comes from `Secrets.swift`.
+
 Your Readwise token is at [readwise.io/access_token](https://readwise.io/access_token).
 
 ### 3. Configure signing
@@ -76,7 +81,7 @@ Select your Apple Watch as the destination and press **⌘R**.
 
 ## How it works
 
-The app calls the Readwise Reader API (`/api/v3/list/`) and looks for the most recently created document tagged `WatchSummary`. The summary text is read from the document's `summary` field and rendered with basic bold formatting.
+The app calls the Readwise Reader API (`/api/v3/list/`) and looks for the most recently created document tagged `WatchSummary`. The displayed text comes from the document's `html_content` field (requested with `withHtmlContent=true` and stripped to plain text), falling back to the `summary` field when `html_content` is empty (see `ReadwiseWatch/Models/ReadwiseDocument.swift`). The text is rendered with basic bold formatting.
 
 The [readwise-ai](https://github.com/samikki/readwise-ai) backend generates these watch summaries and saves them with the correct tag. Run it with:
 
@@ -86,6 +91,12 @@ python build.py --watch
 
 Or automate it with a cron job every few hours.
 
+## Known limitations
+
+- Only the first page of the list API response is read; `nextPageCursor` is ignored. If many documents were added or updated after the latest briefing, it may not be found.
+- The newest briefing is assumed to be the first `WatchSummary`-tagged result; results are not sorted by date in the app.
+- There are no tests.
+
 ## File layout
 
 | File | Purpose |
@@ -93,7 +104,7 @@ Or automate it with a cron job every few hours.
 | `ReadwiseWatch/ContentView.swift` | Main UI — scroll view, formatting, auto-refresh logic |
 | `ReadwiseWatch/Models/ReadwiseDocument.swift` | Readwise API response model |
 | `ReadwiseWatch/Services/ReadwiseAPIService.swift` | API client with retry logic |
-| `ReadwiseWatch/Services/TokenStorage.swift` | Token lookup (Keychain + Secrets.swift fallback) |
+| `ReadwiseWatch/Services/TokenStorage.swift` | Token lookup (Secrets.swift; Keychain lookup present but currently unused) |
 | `ReadwiseWatch/Info.plist` | watchOS app configuration |
 | `Secrets.example.swift` | Template for your token file |
 | `Local.xcconfig` | Your team ID for signing (gitignored) |
